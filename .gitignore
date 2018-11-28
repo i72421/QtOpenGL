@@ -1,0 +1,10 @@
+
+*.obj
+*.tlog
+*.log
+*.pdb
+GeneratedFiles/Debug/moc_OGLWidget.cpp
+GeneratedFiles/qrc_QtOpenGL.cpp
+*.ilk
+Debug/qt.txt
+Win32/Debug/QtOpenGL.exe
