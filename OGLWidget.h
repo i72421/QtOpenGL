@@ -56,10 +56,8 @@ protected:
 private:
 	GLuint IndexBuffer;
 	GLuint PosBuffer;
-	GLuint UVBuffer;
 	std::vector<GLuint> Indices;
 
-	GLuint PosBuffer_Q;
 	GLuint UVBuffer_Q;
 	std::vector<glm::vec3> Pos;
 	std::vector<glm::vec2> UV;
