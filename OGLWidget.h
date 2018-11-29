@@ -5,7 +5,6 @@
 
 #include "gl\glew.h"
 #include "GL\GL.h"
-#include "GL\GLU.h"
 #include "glm\glm.hpp"
 #include "glm\gtc\matrix_transform.hpp"
 #include <vector>
@@ -34,6 +33,7 @@ class OGLWidget : public QOpenGLWidget
 
 public:
 	OGLWidget(QWidget *parent = nullptr);
+	 
 	~OGLWidget();
 	void setTexture(QString path);
 
@@ -49,36 +49,43 @@ protected:
 	void keyPressEvent(QKeyEvent *event) override;
 	void mousePressEvent(QMouseEvent *event) override;
 	void mouseMoveEvent(QMouseEvent *event) override;
+	void mouseReleaseEvent(QMouseEvent *event) override;
 	void wheelEvent(QWheelEvent *event) override;
 
 
 private:
-	std::vector <glm::vec3> Position;
-	std::vector <glm::vec2> TexCoord;
+	GLuint IndexBuffer;
+	GLuint PosBuffer;
+	std::vector<GLuint> Indices;
+
+	GLuint UVBuffer_Q;
+	std::vector<glm::vec3> Pos;
+	std::vector<glm::vec2> UV;
 
 	GLuint VertexArrayID;
 	GLuint programID;
 	GLuint MatrixID;
 	GLuint TextureID;
-	int PostionLocation;
-	int UVLocation;
+	GLuint PostionLocation;
+	GLuint UVLocation;
 
 	GLuint Texture;
-	GLuint vertexbuffer;
-	GLuint uvbuffer;
+	GLuint Texture_Q;
 
 
 	glm::mat4 ViewMatrix;
 	glm::mat4 ProjectionMatrix;
-	glm::mat4 modelMatrix = glm::mat4(1.0f);
+	glm::mat4 modelMatrix;
 
-	glm::vec3 position = glm::vec3(0, 0, 0);
-	float horizontalAngle = 3.14f;
-	float verticalAngle = 0.0f;
-	float initFov = 45.0f;
+	glm::vec3 position;
+	float horizontalAngle;
+	float verticalAngle;
+	float initFov;
 
-	float cameraSpeed = 0.05f;
-	float mouseSpeed = 0.002f;
+	float cameraSpeed;
+	float mouseSpeed;
 
 	QPoint mousePressPos;
+
+	bool Cylinder;
 };
