@@ -42,6 +42,9 @@
     <ClCompile Include="TextureLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="QtOpenGL.qrc">
@@ -50,6 +53,9 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="OGLWidget.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Player.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>

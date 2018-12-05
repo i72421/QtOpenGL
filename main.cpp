@@ -1,11 +1,12 @@
 #include <QtWidgets/QApplication>
-#include "OGLWidget.h"
+#include "Player.h"
 
 int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
-	OGLWidget w;
-	w.show();
+
+	Player player;
+	player.play();
 
 	return a.exec();
 }

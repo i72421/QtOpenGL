@@ -5,13 +5,15 @@ OGLWidget::OGLWidget(QWidget *parent)
 {
 	modelMatrix = glm::mat4(1.0f);
 
-	position = glm::vec3(0, 0, 20);
-	horizontalAngle = 3.14f;
+	position = glm::vec3(0, 0, 0);
+	horizontalAngle = -PI / 2;
 	verticalAngle = 0.0f;
 	initFov = 45.0f;
 
 	cameraSpeed = 0.1f;
 	mouseSpeed = 0.002f;
+
+	resize(800, 450);
 }
 
 OGLWidget::~OGLWidget()
@@ -20,33 +22,38 @@ OGLWidget::~OGLWidget()
 	glDeleteVertexArrays(1, &VertexArrayID);
 }
 
-void OGLWidget::initCylinder(float r, float h, int Horizontal)
+void OGLWidget::initPlane(int width, int height)
 {
 	std::vector<glm::vec3> Vertex;
 	std::vector<glm::vec2> UV;
 
-	float step = 2 * PI / Horizontal;
+		float x = -(float)width / 2;
+		float y = -(float)height / 2;
+		float z = -(float)height / 2 / tan(PI / 8);
 
-	for (int i = 0; i <= Horizontal; i++)
-	{
-		float angle = i * step;
-
-		float x = r * cos(angle);
-		float y = -h / 2;
-		float z = r * sin(angle);
-
-		float u = 1 - (float)i / Horizontal;
+		float u = 0;
 		float v = 0;
-		Vertex.push_back(glm::vec3(x, y, z));
-		UV.push_back(glm::vec2(u, v));
+		Vertex.push_back(glm::vec3(z, y, x));
+		UV.push_back(glm::vec2(1-u, 1-v));
 
-		y = h / 2;
+		y = -y;
 		v = 1;
-		Vertex.push_back(glm::vec3(x, y, z));
-		UV.push_back(glm::vec2(u, v));
-	}
+		Vertex.push_back(glm::vec3(z, y, x));
+		UV.push_back(glm::vec2(1-u, 1-v));
 
-	for (int i = 0; i < Horizontal; i++)
+		x = -x;
+		y = -y;
+		u = 1;
+		v = 0;
+		Vertex.push_back(glm::vec3(z, y, x));
+		UV.push_back(glm::vec2(1-u, 1-v));
+
+		y = -y;
+		v = 1;
+		Vertex.push_back(glm::vec3(z, y, x));
+		UV.push_back(glm::vec2(1-u, 1-v));
+
+	for (int i = 0; i < 2; i++)
 	{
 		Indices.push_back(2 * i);
 		Indices.push_back(2 * i + 2);
@@ -95,7 +102,7 @@ void OGLWidget::initCircle(float r, int Horizontal, int Vertical)
 			float u = (float)i / Horizontal;
 			float v = (float)j / Vertical;
 
-			Vertex.push_back(ElementCoord(glm::vec3(x, y, z), glm::vec2(1 - u, 1 - v)));
+			Vertex.push_back(ElementCoord(glm::vec3(x, y, z), glm::vec2(u, v)));
 		}
 	}
 
@@ -160,7 +167,7 @@ void OGLWidget::initializeGL()
 		return;
 	}
 
-	initCylinder();
+	initPlane();
 	initCircle();
 	reCalcMatrix();
 
@@ -197,6 +204,13 @@ void OGLWidget::paintGL()
 	if (Cylinder)
 	{
 		glBindTexture(GL_TEXTURE_2D, Texture);
+		if (m_data)
+		{
+			m_mutex.lock();
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, m_data);
+			m_mutex.unlock();
+		}
+
 		glUniform1i(TextureID, 0);//set to 0 because the texture is bound to GL_TEXTURE0
 
 		glEnableVertexAttribArray(PostionLocation);
@@ -213,6 +227,9 @@ void OGLWidget::paintGL()
 	else
 	{
 		glBindTexture(GL_TEXTURE_2D, Texture_Q);
+		m_mutex.lock();
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, m_data);
+		m_mutex.unlock();
 		glUniform1i(TextureID, 0);//set to 0 because the texture is bound to GL_TEXTURE0
 
 		glEnableVertexAttribArray(PostionLocation);
@@ -225,7 +242,6 @@ void OGLWidget::paintGL()
 
 		glDrawArrays(GL_TRIANGLES, 0, Pos.size());
 	}
-
 	//
 	glDisableVertexAttribArray(PostionLocation);
 	glDisableVertexAttribArray(UVLocation);
@@ -300,6 +316,7 @@ void OGLWidget::mouseReleaseEvent(QMouseEvent * event)
 	}
 
 	Cylinder = !Cylinder;
+
 	update();
 }
 
@@ -317,8 +334,31 @@ void OGLWidget::wheelEvent(QWheelEvent * event)
 
 void OGLWidget::setTexture(QString path)
 {
+	m_mutex.lock();
 	glDeleteTextures(1, &Texture);
 	Texture = TextureLoader::LoadTexture(path.toLocal8Bit());
+	m_mutex.unlock();
+	update();
+}
+
+void OGLWidget::setTexture(unsigned char * pixals, unsigned int px, unsigned int py)
+{
+	if (m_width != px || m_height != py)
+	{
+		delete[] m_data;
+		m_data = nullptr;
+	}
+
+	if (!m_data)
+	{
+		m_data = new unsigned char[px * py * 3];
+	}
+
+	m_mutex.lock();
+	memcpy(m_data, pixals, px * py * 3);
+	m_width = px;
+	m_height = py;
+	m_mutex.unlock();
 
 	update();
 }

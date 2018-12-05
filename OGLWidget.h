@@ -12,6 +12,8 @@
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QWheelEvent>
+#include <QMutex>
+#include <QOpenGLTexture>
 
 #define  PI		3.1415926535898
 
@@ -36,9 +38,12 @@ public:
 	 
 	~OGLWidget();
 	void setTexture(QString path);
+	void setTexture(unsigned char *pixals,
+		unsigned int px,
+		unsigned int py);
 
 protected:
-	void initCylinder(float r = 5, float h = 10, int Horizontal = 50);
+	void initPlane(int width = 16, int height = 9);
 	void initCircle(float r = 50, int Horizontal = 50, int Vertical = 50);
 	void reCalcMatrix();
 
@@ -90,4 +95,9 @@ private:
 	QPoint mousePressPos;
 
 	bool Cylinder;
+	QMutex m_mutex;
+
+	unsigned char *m_data = nullptr;
+	unsigned int m_width;
+	unsigned int m_height;
 };

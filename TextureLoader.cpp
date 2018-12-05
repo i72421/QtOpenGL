@@ -5,7 +5,7 @@ GLuint TextureLoader::LoadTexture(const char* filename, GLenum image_format, GLi
 	FREE_IMAGE_FORMAT fifmt = FreeImage_GetFileType(filename, 0);
 	FIBITMAP *dib = FreeImage_Load(fifmt, filename, 0);
 
-	dib = FreeImage_ConvertTo24Bits(dib);
+	//dib = FreeImage_ConvertTo24Bits(dib);
 	BYTE *pixels = (BYTE*)FreeImage_GetBits(dib);
 	int width = FreeImage_GetWidth(dib);
 	int height = FreeImage_GetHeight(dib);
